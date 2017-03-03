@@ -10,6 +10,30 @@ description: Learn in what environment Galaxy runs your app
 
 Galaxy runs your app in a set of containers using the [Docker](https://www.docker.com/) container platform.
 
+The actual code that is run is determined by the "base image" --- either the [default base image](/base-image-packages.html) or a [custom base image](/custom-base-images.html).
+
+Galaxy runs your app on 64-bit Linux machines in the UTC time zone.
+
+When Galaxy wants to shut down your container (because you have deployed a new version or because you are scaling down), it first sends the `SIGTERM` signal to your container, waits 30 seconds, and then sends the `SIGKILL` signal.  If you'd like to do some cleanup work before your container dies, you can catch the `SIGTERM` signal (eg, with [`process.on('SIGTERM')`](https://nodejs.org/api/process.html#process_signal_events) in Node).  The `SIGKILL` signal cannot be caught --- your container immediately dies.
+
+<h2 id="env-vars">Environment variables</h2>
+
+Galaxy runs your app with the following environment variables set:
+
+| Environment variable | Default value | meaning |
+| -------------------- | ------------- | ------- |
+| `GALAXY_APP_ID` | App identifier like `Ss8o4Y6KrvFBKKkqM` | Internal identifier for your app. |
+| `GALAXY_APP_VERSION_ID` | Integer like `123` | Your app's version. |
+| `GALAXY_CONTAINER_ID` | Container ID including app ID, like `Ss8o4Y6KrvFBKKkqM-3n28` | Internal identifier for this container. |
+| `GALAXY_LOGGER` | `system` | For historical reasons, indicates to your container that log collection is handled by Galaxy. |
+| `HTTP_FORWARDED_COUNT` | `1` | Tells your app that it is running behind a proxy. |
+| `KADIRA_OPTIONS_HOSTNAME` | Short container ID, like `3n28` | Used to configure the third-party Kadira service. |
+| `METEOR_SETTINGS` | A JSON object, set [when you deploy your app](/deploy-guide.html#settings-create) | Available as [`Meteor.settings`](https://docs.meteor.com/api/core.html#Meteor-settings). Galaxy may add fields to your settings object to enable features such as [prerender](/seo.html), and may reformat the JSON object. |
+| `PORT` | Integer like `3000` | [Port on which your app should listen](#network-incoming). |
+| `ROOT_URL` | Your app's default hostname, prefixed with `http://` or `https://` depending on whether you use Force HTTPS | Used by [`Meteor.absoluteUrl()`](https://docs.meteor.com/api/core.html#Meteor-absoluteUrl) to generate links. |
+
+You can add your own environment variables and override any of these except for the container-specific ones (`GALAXY_CONTAINER_ID` and `KADIRA_OPTIONS_HOSTNAME`) [via your settings.json file](/environment-variables.html).
+
 <h2 id="network">Network environment</h2>
 
 <h3 id="network-incoming">Incoming connections</h3>
