@@ -4,7 +4,7 @@ order: 51
 description: Learn how to start with Meteor APM
 ---
 
-This guide will help you get started with Meteor APM, to better understand how your app behaves and identify areas for improvement.
+This guide will help you get started with Meteor APM. This application performance monitoring (APM) capability helps you understand how your app behaves and identify areas for improvement.
 
 ## Install and Configure Meteor APM
 
